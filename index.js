@@ -43,6 +43,9 @@ client.connect((err) => {
     });
     console.log(req.body);
   });
+  app.delete("/delete/:id", (req, res) => {
+    bookCollection.deleteOne({ _id: ObjectId(req.params.id) });
+  });
   app.post("/addOrder", (req, res) => {
     const newOrder = req.body;
     orderInfo.insertOne(newOrder).then((result) => {
