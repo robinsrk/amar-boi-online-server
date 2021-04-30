@@ -4,8 +4,8 @@ const cors = require("cors");
 const app = express();
 require("dotenv").config();
 app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 const MongoClient = require("mongodb").MongoClient;
 const ObjectId = require("mongodb").ObjectId;
 const url = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.emnwf.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
@@ -20,9 +20,12 @@ client.connect((err) => {
   const orderInfo = client.db(`${process.env.DB_NAME}`).collection("Orders");
   console.log("connected");
   app.get("/books", (req, res) => {
-    bookCollection.find({}).toArray((err, collection) => {
-      res.send(collection);
-    });
+    const search = new RegExp(req.query.search, "i");
+    bookCollection
+      .find({ name: { $regex: search } })
+      .toArray((err, collection) => {
+        res.send(collection);
+      });
   });
   app.get("/book/:id", (req, res) => {
     bookCollection
